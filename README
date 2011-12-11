@@ -1,0 +1,102 @@
+Debian box squeeze 6 64 bit
+
+VM is 8 gig big
+
+installed with hiphop in /home/nico/dev
+
+import the vm in virtualbox 
+        https://www.virtualbox.org/wiki/Downloads
+
+login as root with
+user: root
+pass: a
+
+login as user nico
+user: nico
+pass: a 
+
+if logged in as user nico to install some library use the command 'su' to change to root and pass is 'a'
+
+Test hiphop
+
+$ cd /home/nico/dev
+
+echo "Hello, world." > test.php
+hiphop-php/src/hphp/hphp test.php --keep-tempdir=1 --log=3 --output-dir=$HIPHOP/test-build
+test-build/program -m server -p 8080
+
+rom a browser or other HTTP client, visit http://localhost:8080/test.php
+Output should be "Hello, world."
+
+hip hop is install with this commands
+
+https://github.com/facebook/hiphop-php/wiki/Building-and-installing-on-ubuntu-10.10
+
+Packages installation
+---------------------
+
+sudo apt-get install git-core cmake g++ libboost-dev libmysqlclient-dev libxml2-dev libmcrypt-dev libicu-dev openssl binutils-dev libcap-dev libgd2-xpm-dev zlib1g-dev libtbb-dev libonig-dev libpcre3-dev autoconf libtool libcurl4-openssl-dev libboost-system-dev libboost-program-options-dev libboost-filesystem-dev wget memcached libreadline-dev libncurses-dev libmemcached-dev libicu-dev libbz2-dev libc-client2007e-dev php5-mcrypt php5-imagick libgoogle-perftools-dev
+
+
+Getting HipHop source-code
+--------------------------
+
+mkdir dev
+cd dev
+git clone git://github.com/facebook/hiphop-php.git
+cd hiphop-php
+export CMAKE_PREFIX_PATH=`/bin/pwd`/../
+export HPHP_HOME=`/bin/pwd`
+export HPHP_LIB=`/bin/pwd`/bin
+cd ..
+
+Building third-party libraries
+------------------------------
+
+libevent
+--------
+
+wget http://www.monkey.org/~provos/libevent-1.4.14b-stable.tar.gz
+tar -xzvf libevent-1.4.14b-stable.tar.gz
+cd libevent-1.4.14b-stable
+cp ../hiphop-php/src/third_party/libevent-1.4.14.fb-changes.diff .
+patch -p1 < libevent-1.4.14.fb-changes.diff
+./configure --prefix=$CMAKE_PREFIX_PATH
+make
+make install
+cd ..
+
+libCurl
+-------
+
+wget http://curl.haxx.se/download/curl-7.21.2.tar.gz
+tar -xvzf curl-7.21.2.tar.gz
+cd curl-7.21.2
+cp ../hiphop-php/src/third_party/libcurl.fb-changes.diff .
+patch -p1 < libcurl.fb-changes.diff
+./configure --prefix=$CMAKE_PREFIX_PATH
+make
+make install
+cd ..
+
+libmemcached
+------------
+
+wget http://launchpad.net/libmemcached/1.0/0.49/+download/libmemcached-0.49.tar.gz
+tar -xzvf libmemcached-0.49.tar.gz
+cd libmemcached-0.49
+./configure --prefix=$CMAKE_PREFIX_PATH
+make
+make install
+cd ..
+
+Building HipHop
+---------------
+
+cd hiphop-php
+git submodule init
+git submodule update
+cmake .
+make
+
+
